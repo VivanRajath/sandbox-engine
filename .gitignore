@@ -1,0 +1,27 @@
+# Go workspace
+*.exe
+sandbox-engine
+
+# Python Packages
+build/
+dist/
+*.egg-info/
+sandbox_engine/bin/
+
+# Virtual Environments
+venv/
+.venv/
+.sandbox/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+
+# Logs
+*.log

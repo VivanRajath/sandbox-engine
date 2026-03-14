@@ -1,0 +1,8 @@
+include README.md
+include pyproject.toml
+include setup.py
+include go.mod
+recursive-include cmd *
+recursive-include internal *
+recursive-include pkg *
+recursive-include sandbox_engine *
