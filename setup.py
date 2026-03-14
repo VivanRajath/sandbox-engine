@@ -12,7 +12,7 @@ from setuptools.command.install import install
 # --- CONFIGURATION ---
 PACKAGE_NAME = "sandbox-engine"
 VERSION = "1.0.0"
-GITHUB_REPO = "YOUR_USERNAME/sandbox-engine"  # REPLACE THIS with your GitHub username/repo
+GITHUB_REPO = "VivanRajath/sandbox-engine"  # Just the username/repo format
 # ---------------------
 
 def get_binary_name():
