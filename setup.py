@@ -11,7 +11,7 @@ from setuptools.command.install import install
 
 # --- CONFIGURATION ---
 PACKAGE_NAME = "sandbox-engine-cli"
-VERSION = "1.0.6"
+VERSION = "1.0.7"
 GITHUB_REPO = "VivanRajath/sandbox-engine"  # Just the username/repo format
 # ---------------------
 
