@@ -10,13 +10,14 @@ from setuptools.command.build_py import build_py
 from setuptools.command.install import install
 
 # --- CONFIGURATION ---
-PACKAGE_NAME = "sandbox-engine"
-VERSION = "1.0.0"
+PACKAGE_NAME = "sandbox-engine-cli"
+VERSION = "1.0.4"
 GITHUB_REPO = "VivanRajath/sandbox-engine"  # Just the username/repo format
 # ---------------------
 
 def get_binary_name():
-    return f"{PACKAGE_NAME}.exe" if platform.system() == "Windows" else PACKAGE_NAME
+    # Keep the binary name as sandbox-engine even if package is sandbox-engine-cli
+    return "sandbox-engine.exe" if platform.system() == "Windows" else "sandbox-engine"
 
 def get_download_url():
     """Generates the GitHub Release URL matching the current OS and architecture."""
@@ -32,11 +33,11 @@ def get_download_url():
         raise Exception(f"Unsupported architecture: {machine}")
         
     if system == "windows":
-        filename = f"{PACKAGE_NAME}-windows-{arch}.exe"
+        filename = f"sandbox-engine-windows-{arch}.exe"
     elif system == "darwin":
-        filename = f"{PACKAGE_NAME}-darwin-{arch}"
+        filename = f"sandbox-engine-darwin-{arch}"
     elif system == "linux":
-        filename = f"{PACKAGE_NAME}-linux-{arch}"
+        filename = f"sandbox-engine-linux-{arch}"
     else:
         raise Exception(f"Unsupported OS: {system}")
         
@@ -97,17 +98,16 @@ setup(
     long_description=open("README.md", "r", encoding="utf-8").read() if os.path.exists("README.md") else "",
     long_description_content_type="text/markdown",
     author="Vivan Rajath",
-    author_email="your.email@example.com",  # REPLACE THIS
+    author_email="vivanrajath999@gmail.com",
     url=f"https://github.com/{GITHUB_REPO}",
     packages=["sandbox_engine"],
     package_data={
         "sandbox_engine": ["bin/*", "bin/*.exe"],
     },
     include_package_data=True,
-    # This exposes the binary directly to the python Scripts/bin path
     entry_points={
         "console_scripts": [
-            f"{PACKAGE_NAME}=sandbox_engine.cli:run",
+            "sandbox-engine=sandbox_engine.cli:run",
         ],
     },
     cmdclass={

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -57,11 +58,72 @@ var stdlibModules = map[string]bool{
 	"zipapp": true, "zipfile": true, "zipimport": true, "zlib": true, "_thread": true,
 }
 
+// importToPip maps import names to their actual pip package names when they differ.
+// e.g. `import dotenv` is installed via `pip install python-dotenv`
+var importToPip = map[string]string{
+	"dotenv":        "python-dotenv",
+	"cv2":           "opencv-python",
+	"sklearn":       "scikit-learn",
+	"PIL":           "Pillow",
+	"bs4":           "beautifulsoup4",
+	"yaml":          "PyYAML",
+	"attr":          "attrs",
+	"dateutil":      "python-dateutil",
+	"usb":           "pyusb",
+	"serial":        "pyserial",
+	"OpenSSL":       "pyOpenSSL",
+	"gi":            "PyGObject",
+	"wx":            "wxPython",
+	"gtk":           "PyGTK",
+	"MySQLdb":       "mysqlclient",
+	"pymysql":       "PyMySQL",
+	"psycopg2":      "psycopg2-binary",
+	"pkg_resources": "setuptools",
+	"google":        "google-cloud",
+	"sklearn_extra": "scikit-learn-extra",
+	"tzlocal":       "tzlocal",
+	"tz":            "pytz",
+	"Crypto":        "pycryptodome",
+	"nacl":          "PyNaCl",
+	"jwt":           "PyJWT",
+	"magic":         "python-magic",
+	"docx":          "python-docx",
+	"pptx":          "python-pptx",
+	"openpyxl":      "openpyxl",
+	"xlrd":          "xlrd",
+	"xlwt":          "xlwt",
+	"mpl_toolkits":  "matplotlib",
+	"skimage":       "scikit-image",
+	"Bio":           "biopython",
+	"astropy":       "astropy",
+	"Levenshtein":   "python-Levenshtein",
+	"fuzz":          "fuzzywuzzy",
+	"telegram":      "python-telegram-bot",
+	"discord":       "discord.py",
+	"slack_sdk":     "slack-sdk",
+	"anthropic":     "anthropic",
+}
+
+// buildLocalModuleSet collects the stem names of all .py files in the project
+// so that local modules (e.g. `main`, `utils`) are not mistaken for pip packages.
+func buildLocalModuleSet(pythonFiles []string) map[string]bool {
+	local := map[string]bool{}
+	for _, f := range pythonFiles {
+		base := filepath.Base(f)
+		stem := strings.TrimSuffix(base, ".py")
+		local[stem] = true
+	}
+	return local
+}
+
 func GenerateRequirements(scan *types.ScanResult) ([]string, error) {
 
 	deps := map[string]bool{}
 
 	importRegex := regexp.MustCompile(`(?m)^\s*(?:import|from)\s+([a-zA-Z0-9_]+)`)
+
+	// Build a set of local module names so we don't add them as pip packages
+	localModules := buildLocalModuleSet(scan.PythonFiles)
 
 	for _, file := range scan.PythonFiles {
 
@@ -82,7 +144,15 @@ func GenerateRequirements(scan *types.ScanResult) ([]string, error) {
 
 				pkg := match[1]
 
-				if !stdlibModules[pkg] {
+				// Skip stdlib modules and local project modules
+				if stdlibModules[pkg] || localModules[pkg] {
+					continue
+				}
+
+				// Remap import name to actual pip package name if needed
+				if pipName, ok := importToPip[pkg]; ok {
+					deps[pipName] = true
+				} else {
 					deps[pkg] = true
 				}
 			}
