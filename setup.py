@@ -11,7 +11,7 @@ from setuptools.command.install import install
 
 # --- CONFIGURATION ---
 PACKAGE_NAME = "sandbox-engine-cli"
-VERSION = "1.0.4"
+VERSION = "1.0.6"
 GITHUB_REPO = "VivanRajath/sandbox-engine"  # Just the username/repo format
 # ---------------------
 
@@ -51,9 +51,7 @@ def build_or_download_binary():
     os.makedirs(bin_path, exist_ok=True)
     target_bin = os.path.join(bin_path, bin_name)
     
-    # Check if we already built/downloaded it
-    if os.path.exists(target_bin):
-        return target_bin
+    # Always rebuild/re-download to ensure upgrades pick up the latest binary
         
     print("Attempting to compile Go source...")
     try:
